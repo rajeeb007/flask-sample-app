@@ -6,6 +6,7 @@ pipeline {
         DOCKER_IMAGE = "rajeeb007/flask-app"
         IMAGE_TAG = "${BUILD_ID}"
         NAMESPACE = "flask-app"
+        MINIKUBE_KUBECONFIG = credentials('config')  // Minikube config file credential
     }
 
     stages {
@@ -45,6 +46,10 @@ pipeline {
         stage('Deploy to Minikube') {
             steps {
                 script {
+                    // Set the KUBECONFIG environment variable using the Minikube credential
+                    writeFile(file: '/tmp/kubeconfig', text: MINIKUBE_KUBECONFIG)
+                    sh "export KUBECONFIG=/tmp/kubeconfig"
+
                     // Ensure namespace exists
                     sh "kubectl get ns $NAMESPACE || kubectl create ns $NAMESPACE"
 
