@@ -50,7 +50,7 @@ pipeline {
 
                     // Replace the image tag dynamically in the deployment file and apply
                     sh """
-                        sed 's/\\$\\{BUILD_ID\\}/$IMAGE_TAG/g' k8s/deployment.yml | kubectl apply -n $NAMESPACE -f -
+                        sed 's/\\$\\{BUILD_ID\\}/'${IMAGE_TAG}'/g' k8s/deployment.yml | kubectl apply -n $NAMESPACE -f -
                         kubectl apply -n $NAMESPACE -f k8s/service.yml
                     """
 
