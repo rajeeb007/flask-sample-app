@@ -10,7 +10,7 @@ pipeline {
     stages {
         stage('Checkout Code') {
             steps {
-                git 'https://github.com/rajeeb007/flask-sample-app.git'
+                git credentialsId: 'git-cred', url: 'https://github.com/rajeeb007/flask-sample-app.git'
             }
         }
         stage('Build Docker Image') {
