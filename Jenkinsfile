@@ -6,7 +6,6 @@ pipeline {
         DOCKER_IMAGE = "rajeeb007/flask-app"
         IMAGE_TAG = "${BUILD_ID}"
         NAMESPACE = "flask-app"
-        MINIKUBE_KUBECONFIG = credentials('config')  // Minikube config file credential
         kubeconfig_path = "/var/lib/jenkins/.kube/config"
     }
 
@@ -47,23 +46,11 @@ pipeline {
         stage('Deploy to Minikube') {
             steps {
                 script {
-                    // Set the KUBECONFIG environment variable using the Minikube credential
-                    //writeFile(file: '/tmp/kubeconfig', text: MINIKUBE_KUBECONFIG)
-                    //sh "export KUBECONFIG=/tmp/kubeconfig"
-
-                    // Ensure namespace exists
-                    // sh "kubectl get ns $NAMESPACE || kubectl create ns $NAMESPACE"
                     
-                    sh "kubectl --kubeconfig=${kubeconfig_path} apply -f ./k8s/deployment.yaml"
+                    
+                    sh "kubectl --kubeconfig=${kubeconfig_path} apply -f ./k8s/deployment.yml"
 
-                    // Replace the image tag dynamically in the deployment file and apply
-                    //sh """
-                      //  sed 's/\${BUILD_ID}/$IMAGE_TAG/g' k8s/deployment.yml | kubectl apply -n $NAMESPACE -f -
-                        //kubectl apply -n $NAMESPACE -f k8s/service.yml
-                    //"""
-
-                    // Optional: check if pods are running
-                   // sh "kubectl get pods -n $NAMESPACE"
+                    
                 }
             }
         }
