@@ -7,7 +7,7 @@ pipeline {
         IMAGE_TAG = "${BUILD_ID}"
         NAMESPACE = "flask-app"
         MINIKUBE_KUBECONFIG = credentials('config')  // Minikube config file credential
-        kubeconfig_path = "/home/rajeeb/.kube/config"
+        kubeconfig_path = "/var/lib/jenkins/.kube/config"
     }
 
     stages {
