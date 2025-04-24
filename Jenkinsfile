@@ -46,11 +46,21 @@ pipeline {
         stage('Deploy to Minikube') {
             steps {
                 script {
+                    // Replace ${BUILD_ID} in deployment.yml and apply
+                    sh """
+                        sed -i 's/\\$\\{BUILD_ID\\}/${BUILD_ID}/g' ./k8s/deployment.yml
+                        kubectl --kubeconfig=${kubeconfig_path} apply -f ./k8s/deployment.yml
+                        kubectl --kubeconfig=${kubeconfig_path} apply -f ./k8s/service.yml
+                    """
                     
+                    // Optional debugging - show the modified deployment file
+                    sh 'cat ./k8s/deployment.yml'
                     
-                    sh "kubectl --kubeconfig=${kubeconfig_path} apply -f ./k8s/deployment.yml"
-
-                    
+                    // Optional - verify deployment
+                    sh """
+                        kubectl --kubeconfig=${kubeconfig_path} get deployments -n ${NAMESPACE}
+                        kubectl --kubeconfig=${kubeconfig_path} get pods -n ${NAMESPACE}
+                    """
                 }
             }
         }
