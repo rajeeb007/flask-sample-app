@@ -5,22 +5,24 @@ pipeline {
         DOCKERHUB_CREDENTIALS = credentials('dockerhub-creds') // Jenkins Credentials ID
         DOCKER_IMAGE = "rajeeb007/flask-app"
         IMAGE_TAG = "${BUILD_ID}"
+        NAMESPACE = "flask-app"
     }
 
     stages {
         stage('Check Git Version') {
             steps {
                 script {
-                    // Checking the git version
                     sh 'git --version'
                 }
             }
         }
+
         stage('Checkout Code') {
             steps {
                 git credentialsId: 'git-cred', url: 'https://github.com/rajeeb007/flask-sample-app.git', branch: 'main'
             }
         }
+
         stage('Build Docker Image') {
             steps {
                 script {
@@ -28,6 +30,7 @@ pipeline {
                 }
             }
         }
+
         stage('Docker Login & Push') {
             steps {
                 script {
@@ -38,14 +41,32 @@ pipeline {
                 }
             }
         }
+
+        stage('Deploy to Minikube') {
+            steps {
+                script {
+                    // Ensure namespace exists
+                    sh "kubectl get ns $NAMESPACE || kubectl create ns $NAMESPACE"
+
+                    // Replace the image tag dynamically in the deployment file and apply
+                    sh """
+                        sed 's/\\$\\{BUILD_ID\\}/$IMAGE_TAG/g' k8s/deployment.yml | kubectl apply -n $NAMESPACE -f -
+                        kubectl apply -n $NAMESPACE -f k8s/service.yml
+                    """
+
+                    // Optional: check if pods are running
+                    sh "kubectl get pods -n $NAMESPACE"
+                }
+            }
+        }
     }
 
     post {
         success {
-            echo '✅ Successfully built, pushed, and deployed!'
+            echo '✅ Successfully built, pushed to Docker Hub, and deployed to Minikube!'
         }
         failure {
-            echo '❌ Build failed.'
+            echo '❌ Build or deployment failed.'
         }
     }
 }
