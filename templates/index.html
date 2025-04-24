@@ -1,0 +1,64 @@
+<!-- templates/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flask Demo App</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Flask Demo Application</h1>
+            <p class="subtitle">A simple web application built with Flask</p>
+        </header>
+        
+        <div class="server-info">
+            <p>Server time: {{ server_time }}</p>
+        </div>
+        
+        <div class="main-content">
+            <div class="card">
+                <h2>API Endpoints</h2>
+                <ul>
+                    <li><a href="/health" target="_blank">/health</a> - Check server health</li>
+                    <li><a href="/info" target="_blank">/info</a> - Server information</li>
+                    <li><a href="/api/notes" target="_blank">/api/notes</a> - Get all notes</li>
+                </ul>
+            </div>
+            
+            <div class="card">
+                <h2>Notes Manager</h2>
+                <div id="notes-container">
+                    <div class="notes-list">
+                        <h3>All Notes</h3>
+                        <ul id="notes-list"></ul>
+                    </div>
+                    
+                    <div class="note-form">
+                        <h3>Add New Note</h3>
+                        <form id="note-form">
+                            <div class="form-group">
+                                <label for="title">Title:</label>
+                                <input type="text" id="title" name="title" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="content">Content:</label>
+                                <textarea id="content" name="content" rows="4" required></textarea>
+                            </div>
+                            <button type="submit" class="btn">Add Note</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>&copy; 2025 Flask Demo App. Created for JIITAK Assessment.</p>
+        </footer>
+    </div>
+    
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
