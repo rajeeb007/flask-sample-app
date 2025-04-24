@@ -8,6 +8,14 @@ pipeline {
     }
 
     stages {
+        stage('Check Git Version') {
+            steps {
+                script {
+                    // Checking the git version
+                    sh 'git --version'
+                }
+            }
+        }
         stage('Checkout Code') {
             steps {
                 git credentialsId: 'git-cred', url: 'https://github.com/rajeeb007/flask-sample-app.git'
