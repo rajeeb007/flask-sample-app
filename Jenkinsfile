@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        DOCKERHUB_CREDENTIALS = credentials('dockerhub-creds') // Jenkins Credentials ID
+        DOCKERHUB_CREDENTIALS = credentials('dockerhub-creds')
         DOCKER_IMAGE = "rajeeb007/flask-app"
         IMAGE_TAG = "${BUILD_ID}"
         NAMESPACE = "flask-app"
@@ -27,7 +27,9 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    sh "docker build -t $DOCKER_IMAGE:$IMAGE_TAG ."
+                    sh '''
+                        docker build -t ${DOCKER_IMAGE}:${IMAGE_TAG} .
+                    '''
                 }
             }
         }
@@ -35,10 +37,10 @@ pipeline {
         stage('Docker Login & Push') {
             steps {
                 script {
-                    sh """
+                    sh '''
                         echo "${DOCKERHUB_CREDENTIALS_PSW}" | docker login -u "${DOCKERHUB_CREDENTIALS_USR}" --password-stdin
                         docker push ${DOCKER_IMAGE}:${IMAGE_TAG}
-                    """
+                    '''
                 }
             }
         }
@@ -46,21 +48,12 @@ pipeline {
         stage('Deploy to Minikube') {
             steps {
                 script {
-                    // Replace ${BUILD_ID} in deployment.yml and apply
-                    sh """
-                        sed -i 's/\\$\\{BUILD_ID\\}/${BUILD_ID}/g' ./k8s/deployment.yml
+                    sh '''
+                        sed -i "s/\\${BUILD_ID}/${BUILD_ID}/g" ./k8s/deployment.yml
                         kubectl --kubeconfig=${kubeconfig_path} apply -f ./k8s/deployment.yml
                         kubectl --kubeconfig=${kubeconfig_path} apply -f ./k8s/service.yml
-                    """
-                    
-                    // Optional debugging - show the modified deployment file
+                    '''
                     sh 'cat ./k8s/deployment.yml'
-                    
-                    // Optional - verify deployment
-                    sh """
-                        kubectl --kubeconfig=${kubeconfig_path} get deployments -n ${NAMESPACE}
-                        kubectl --kubeconfig=${kubeconfig_path} get pods -n ${NAMESPACE}
-                    """
                 }
             }
         }
